@@ -1,0 +1,37 @@
+<h1>Edit Review</h1>
+
+<%= form_with model: @review, url: review_path(@review), method: :patch do |f| %>
+  <%# Show selected track summary %>
+  <% if @song.present? %>
+    <div class="selected-track" style="border:1px solid #e5e7eb;padding:12px;margin-bottom:12px;border-radius:6px;display:flex;gap:1rem;align-items:flex-start;">
+      <% if @song_image.present? %>
+        <img src="<%= @song_image %>" alt="<%= (@song.album.presence || @song.title.presence || 'Album') %>" style="width: 120px; height: 120px; object-fit: cover; border-radius: 6px; flex-shrink: 0;" />
+      <% end %>
+      <div style="flex:1;">
+        <strong>Editing review for</strong>
+        <div style="margin-top:8px">
+          <div><strong>Track:</strong> <%= @song.title %></div>
+          <div><strong>Artist(s):</strong> <%= @song.artist %></div>
+          <% if @song.album.present? %>
+            <div><strong>Album:</strong> <%= @song.album %></div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :rating %>
+    <%= f.number_field :rating, in: 1..5 %>
+  </div>
+
+  <div>
+    <%= f.label :comment %>
+    <%= f.text_area :comment, rows: 6 %>
+  </div>
+
+  <div>
+    <%= f.submit 'Update review', class: 'btn btn-primary' %>
+    <%= link_to 'Cancel', song_path(@song), class: 'btn btn-secondary' %>
+  </div>
+<% end %>

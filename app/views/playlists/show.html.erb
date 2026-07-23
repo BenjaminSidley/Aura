@@ -1,0 +1,79 @@
+<h1><%= @playlist.title %></h1>
+<p><%= @playlist.description %></p>
+
+<p>
+  <%= link_to 'Publish to Last.fm', publish_to_lastfm_playlist_path(@playlist), method: :post, class: 'btn btn-primary' %>
+  <%= button_tag 'Add', type: 'button', id: 'open-lastfm-search', class: 'btn btn-secondary' %>
+</p>
+
+<!-- Hidden Last.fm search bar (reuses the same simple search used on the songs index) -->
+<div id="lastfm-search-for-playlist" style="display:none; margin-top:12px;">
+  <% if current_user && current_user.lastfm_connected? %>
+    <div class="lastfm-search" style="margin-bottom:18px;">
+      <%= form_with url: lastfm_search_path, method: :get, local: true do |f| %>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <%= f.text_field :q, placeholder: 'Search Last.fm — song or artist', value: params[:q], size: 40, class: 'input' %>
+          <%= f.hidden_field :playlist_id, value: @playlist.id %>
+          <%= f.submit 'Search & Add', class: 'btn btn-primary' %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p><%= link_to 'Connect Last.fm', lastfm_auth_path, class: 'btn btn-primary', data: { turbo: false } %> to search and add tracks from Last.fm.</p>
+  <% end %>
+</div>
+
+<script>
+  // Toggle Last.fm search box - works with Turbo
+  function setupPlaylistAddButton() {
+    var btn = document.getElementById('open-lastfm-search');
+    var box = document.getElementById('lastfm-search-for-playlist');
+    if (!btn || !box) return;
+    
+    // Remove existing listener if any
+    btn.replaceWith(btn.cloneNode(true));
+    btn = document.getElementById('open-lastfm-search');
+    
+    btn.addEventListener('click', function() {
+      if (box.style.display === 'none' || box.style.display === '') {
+        box.style.display = 'block';
+        btn.textContent = 'Close';
+      } else {
+        box.style.display = 'none';
+        btn.textContent = 'Add';
+      }
+    });
+  }
+  
+  // Run on initial load and Turbo navigation
+  document.addEventListener('DOMContentLoaded', setupPlaylistAddButton);
+  document.addEventListener('turbo:load', setupPlaylistAddButton);
+  
+  // Also run immediately in case the script loads after DOM is ready
+  if (document.readyState === 'loading') {
+    // Do nothing, wait for DOMContentLoaded
+  } else {
+    // DOM is already ready
+    setupPlaylistAddButton();
+  }
+</script>
+
+<h3>Songs</h3>
+<% if @playlist.songs.any? %>
+  <ol>
+    <% @playlist.songs.each do |s| %>
+      <li style="display: flex; align-items: center; justify-content: space-between; list-style-position: inside;">
+        <span><%= link_to s.title, song_path(s) %> — <%= s.artist %></span>
+        <% if current_user && @playlist.user == current_user %>
+          <%= link_to '×', remove_song_playlist_path(@playlist, song_id: s.id), 
+              method: :delete, 
+              data: { turbo_method: :delete, turbo_confirm: "Remove \"#{s.title}\" from playlist?" },
+              style: 'text-decoration:none; color:#dc3545; font-size:1.5em; line-height:1; padding:0 0.25em;',
+              title: 'Remove from playlist' %>
+        <% end %>
+      </li>
+    <% end %>
+  </ol>
+<% else %>
+  <p class="text-muted">No songs in this playlist yet.</p>
+<% end %>

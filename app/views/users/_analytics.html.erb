@@ -1,0 +1,91 @@
+<div class="analytics-dashboard">
+  <h2>Analytics</h2>
+  <% analytics = defined?(@analytics) && @analytics.present? ? @analytics : AnalyticsService.new(@user) %>
+  <div class="analytics-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card">
+      <h3>Top Last.fm Artists</h3>
+      <% if @user.lastfm_connected %>
+        <% artists = analytics.lastfm_top_artists(limit: 5) %>
+        <% if artists.any? %>
+          <ol>
+            <% artists.each do |a| %>
+              <li><%= a[:artist] %> — <%= a[:plays] %> plays</li>
+            <% end %>
+          </ol>
+        <% else %>
+          <p>No recent Last.fm data available.</p>
+        <% end %>
+      <% else %>
+        <p>Connect Last.fm to see listening stats.</p>
+      <% end %>
+    </div>
+
+    <div class="card">
+      <h3>Top Aura Songs</h3>
+      <% top = analytics.aura_top_rated_songs(limit: 5) %>
+      <% if top.any? %>
+        <ol>
+          <% top.each do |s| %>
+              <% avg = (s.respond_to?(:avg_rating) && s.avg_rating) || s.average_rating %>
+              <li style="display:flex;align-items:center;gap:8px;">
+                <div style="flex:1"><%= link_to s.title, song_path(s) %> — <%= s.artist %> (<%= avg || '—' %>)</div>
+                <div><%= link_to 'Review', new_review_path(song_id: s.id), class: 'btn btn-sm' %></div>
+              </li>
+            <% end %>
+        </ol>
+      <% else %>
+        <p>No rated songs yet.</p>
+      <% end %>
+    </div>
+
+    <div class="card">
+      <h3>Your Top Rated</h3>
+      <% personal = analytics.user_top_rated_songs(limit: 5) %>
+      <% if personal.any? %>
+        <ol>
+          <% personal.each do |s| %>
+            <% avg = (s.respond_to?(:avg_rating) && s.avg_rating) || s.average_rating %>
+            <li><%= link_to s.title, song_path(s) %> — <%= s.artist %> (<%= avg || '—' %>)</li>
+          <% end %>
+        </ol>
+      <% else %>
+        <p>You haven't rated any songs yet.</p>
+      <% end %>
+    </div>
+
+    <div class="card">
+      <h3>Recommendations</h3>
+      <% recs = analytics.recommendations_for_user(limit: 5) %>
+      <% if recs.any? %>
+        <ol>
+          <% recs.each do |item| %>
+            <% if item.is_a?(Song) || item.respond_to?(:title) %>
+              <% s = item %>
+              <% avg = (s.respond_to?(:avg_rating) && s.avg_rating) || s.average_rating %>
+              <li style="display:flex;align-items:center;gap:8px;">
+                <div style="flex:1"><%= link_to s.title, song_path(s) %> — <%= s.artist %> (<%= avg || '—' %>)</div>
+                <div><%= link_to 'Review', new_review_path(song_id: s.id), class: 'btn btn-sm' %></div>
+              </li>
+            <% elsif item.is_a?(Hash) && item[:name].present? %>
+              <li style="display:flex;align-items:center;gap:8px;">
+                <div style="flex:1">
+                  <% if item[:url].present? %>
+                    <a href="<%= item[:url] %>" target="_blank" rel="noopener noreferrer"><%= item[:name] %></a>
+                  <% else %>
+                    <%= item[:name] %>
+                  <% end %>
+                   — <%= item[:artist] %>
+                </div>
+                <div>
+                  <%= link_to 'Review', new_review_path(track_name: item[:name], artists: item[:artist], album_title: nil), class: 'btn btn-sm' %>
+                </div>
+              </li>
+            <% end %>
+          <% end %>
+        </ol>
+      <% else %>
+        <p>No recommendations at the moment.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

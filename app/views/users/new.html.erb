@@ -1,0 +1,50 @@
+<h2>Sign up for Aura</h2>
+<p class="text-muted">Join the community and start tracking your music taste</p>
+
+<%= form_with model: @user, url: signup_with_lastfm_path, local: true, id: "signup_form", data: { turbo: false } do |f| %>
+  <% if @user.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h2>
+      <ul>
+        <% @user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name, "Full Name" %><br>
+    <%= f.text_field :name, placeholder: "John Doe" %>
+  </div>
+
+  <div>
+    <%= f.label :username, "Username" %><br>
+    <%= f.text_field :username, autocomplete: "username", placeholder: "John.doe" %>
+  </div>
+
+  <div>
+  <%= f.label :email, "Email" %><br>
+    <%= f.email_field :email, autocomplete: "email", placeholder: "you@example.com" %>
+  </div>
+
+  <div>
+    <%= f.label :password, "Password" %><br>
+    <%= f.password_field :password, autocomplete: "new-password", placeholder: "Min 6 characters" %>
+  </div>
+
+  <div>
+    <%= f.label :password_confirmation, "Confirm Password" %><br>
+    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
+  </div>
+
+  <div style="margin-top: 30px; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+    <h4>Connect Your Last.fm Account</h4>
+    <p class="text-muted">Last.fm connection is required to unlock personalized recommendations and track your listening history.</p>
+    
+    <%= f.submit "Connect Last.fm and Create Account", class: "btn btn-primary btn-lg" %>
+    <p class="text-muted small mt-2">You'll be redirected to Last.fm to authorize, then your account will be created.</p>
+  </div>
+<% end %>
+
+<p class="text-muted mt-lg">Already have an account? <%= link_to "Sign in here", new_session_path %></p>

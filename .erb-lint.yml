@@ -1,0 +1,10 @@
+linters:
+  RuboCop:
+    enabled: true
+  Html:
+    enabled: true
+  TrailingWhitespace:
+    enabled: true
+Exclude:
+  - 'node_modules/**'
+  - 'vendor/**'

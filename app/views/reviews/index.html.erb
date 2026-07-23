@@ -1,0 +1,31 @@
+<h1>All Reviews</h1>
+
+<% if @reviews.any? %>
+  <div class="reviews-list">
+    <% @reviews.each do |review| %>
+      <div class="review" style="border: 1px solid #e5e7eb; padding: 16px; margin-bottom: 16px; border-radius: 8px;">
+        <div class="review-header" style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+          <div>
+            <div style="font-weight: 600; margin-bottom: 4px;">
+              <%= link_to review.song.title, song_path(review.song) %> by <%= review.song.artist %>
+            </div>
+            <div style="font-size: 0.9em; color: #666;">
+              Reviewed by <%= link_to review.user.name, user_path(review.user) %>
+              <span style="margin-left: 8px;">★ <%= review.rating %> / 5</span>
+            </div>
+          </div>
+          <div style="font-size: 0.85em; color: #999;">
+            <%= time_ago_in_words(review.created_at) %> ago
+          </div>
+        </div>
+        <p class="review-comment" style="margin: 0;">
+          <%= review.comment %>
+        </p>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <p>No reviews yet.</p>
+<% end %>
+
+<%= link_to 'Back to Discover', root_path, class: 'btn btn-secondary' %>

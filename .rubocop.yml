@@ -1,0 +1,15 @@
+require:
+  - rubocop-rails
+
+inherit_gem:
+  rubocop-rails: config/default.yml
+
+AllCops:
+  TargetRubyVersion: 3.4
+  Exclude:
+    - 'db/schema.rb'
+    - 'bin/**'
+    - 'node_modules/**'
+    - 'tmp/**'
+    - 'vendor/**'
+  SuggestExtensions: false

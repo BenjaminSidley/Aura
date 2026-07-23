@@ -1,0 +1,48 @@
+<div class="song-header" style="display: flex; gap: 2rem; align-items: flex-start;">
+  <% if @song_image.present? %>
+    <img src="<%= @song_image %>" alt="<%= @song.album.presence || @song.title %>" style="width: 200px; height: 200px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+  <% end %>
+  <div style="flex: 1;">
+    <h1><%= @song.title %></h1>
+    <p><strong>Artist:</strong> <%= @song.artist %></p>
+    <% if @song.album.present? %>
+      <p><strong>Album:</strong> <%= @song.album %></p>
+    <% end %>
+    <% if @song.reviews.any? %>
+      <p><strong>Average Rating:</strong> <%= @song.average_rating %> / 5</p>
+    <% end %>
+  </div>
+</div>
+
+<h2>Reviews</h2>
+
+<% if current_user %>
+  <div style="margin-bottom: 16px;">
+    <%= link_to 'Write another Review', new_review_path(song_id: @song.id), class: 'btn btn-primary' %>
+    <%= link_to 'See your Reviews', user_path(current_user), class: 'btn btn-secondary' %>
+  </div>
+<% end %>
+
+<% if @reviews.any? %>
+  <% @reviews.each do |review| %>
+    <div class="review" style="border: 1px solid #e5e7eb; padding: 16px; margin-bottom: 16px; border-radius: 8px;">
+      <div class="review-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div>
+          <span class="review-user"><%= link_to review.user.name, user_path(review.user) %></span>
+          <span class="review-rating" style="margin-left: 12px; color: #ffd700;">★ <%= review.rating %> / 5</span>
+        </div>
+        <% if current_user && review.user == current_user %>
+          <div>
+            <%= link_to 'Edit', edit_review_path(review), class: 'btn btn-sm btn-secondary' %>
+          </div>
+        <% end %>
+      </div>
+      <p class="review-comment" style="margin: 0;"><%= review.comment %></p>
+    </div>
+  <% end %>
+<% else %>
+  <p>No reviews yet for this song.</p>
+  <% if current_user %>
+    <%= link_to 'Be the first to review!', new_review_path(song_id: @song.id), class: 'btn btn-primary' %>
+  <% end %>
+<% end %>

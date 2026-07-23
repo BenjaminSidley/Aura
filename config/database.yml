@@ -1,0 +1,35 @@
+# config/database.yml
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: aura_development
+
+test:
+  <<: *default
+  database: aura_test
+
+production:
+  primary:
+    <<: *default
+    url: <%= ENV["DATABASE_URL"] %>
+    prepared_statements: false  # pgbouncer-friendly
+
+  # Solid* engines expect these connection names to exist
+  queue:
+    <<: *default
+    url: <%= ENV["DATABASE_URL"] %>
+    prepared_statements: false
+
+  cache:
+    <<: *default
+    url: <%= ENV["DATABASE_URL"] %>
+    prepared_statements: false
+
+  cable:
+    <<: *default
+    url: <%= ENV["DATABASE_URL"] %>
+    prepared_statements: false

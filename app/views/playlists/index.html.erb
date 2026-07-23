@@ -1,0 +1,17 @@
+<h1>Your Playlists</h1>
+
+<p>
+  <%= link_to 'Create playlist from top rated', from_top_rated_playlists_path, method: :get, class: 'btn btn-primary' %>
+  <%= link_to 'New playlist', new_playlist_path, class: 'btn btn-secondary' %>
+</p>
+
+<ul>
+  <% @playlists.each do |pl| %>
+    <li>
+      <%= link_to pl.title, playlist_path(pl) %>
+      <% if pl.published_to_lastfm %>
+        <em>(published)</em>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

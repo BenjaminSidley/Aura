@@ -1,0 +1,24 @@
+<h1>Recently played</h1>
+
+<% if @tracks.present? %>
+  <ul class="recent-tracks">
+    <% @tracks.each do |t| %>
+      <li class="track" style="display:flex; gap:12px; margin-bottom:12px; align-items:center;">      
+        <div style="flex:1">
+          <div><strong><%= t[:name] %></strong></div>
+          <div><em><%= t[:artists] %></em> — <%= t[:album] %></div>
+          <div style="font-size:0.9em; color:#666">played at: <%= t[:played_at] ? Time.parse(t[:played_at]).in_time_zone : '—' %></div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <%= link_to 'Review', new_review_path(track_id: t[:id], track_name: t[:name], artists: t[:artists], album: t[:album]), class: 'btn' %>
+          <% if t[:external_url] %>
+            <%= link_to 'Open in Last.fm', t[:external_url], target: '_blank', rel: 'noopener', class: 'btn btn-secondary' %>
+          <% end %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% else %>
+  <p>No recently played tracks found.</p>
+<% end %>
+

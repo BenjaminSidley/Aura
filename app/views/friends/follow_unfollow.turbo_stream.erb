@@ -1,0 +1,11 @@
+<turbo-stream action="replace" target="follow-btn-<%= @user.id %>">
+  <template>
+    <div id="follow-btn-<%= @user.id %>">
+      <% if current_user.following?(@user) %>
+        <%= button_to "Following", unfollow_friend_path(@user), method: :delete, class: "btn btn-sm btn-outline-secondary", title: "Unfollow", remote: true %>
+      <% else %>
+        <%= button_to "Follow", follow_friend_path(@user), method: :post, class: "btn btn-sm btn-primary", title: "Follow", remote: true %>
+      <% end %>
+    </div>
+  </template>
+</turbo-stream>

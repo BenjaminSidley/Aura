@@ -1,0 +1,20 @@
+<%= form_with model: playlist, local: true do |f| %>
+  <div>
+    <%= f.label :title %>
+    <%= f.text_field :title %>
+  </div>
+
+  <div>
+    <%= f.label :description %>
+    <%= f.text_area :description %>
+  </div>
+
+  <% if defined?(preselected_song) && preselected_song %>
+    <p>Will add: <strong><%= preselected_song.title %></strong> — <%= preselected_song.artist %></p>
+    <%= hidden_field_tag :song_id, preselected_song.id %>
+  <% end %>
+
+  <div>
+    <%= f.submit 'Create Playlist', class: 'btn btn-primary' %>
+  </div>
+<% end %>

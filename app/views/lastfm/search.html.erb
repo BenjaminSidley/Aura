@@ -1,0 +1,40 @@
+<h1>Search Last.fm</h1>
+
+<%= form_with url: lastfm_search_path, method: :get, local: true do |f| %>
+  <div>
+    <%= f.label :q, 'Search for a song or artist' %>
+    <%= f.text_field :q, value: @query, placeholder: 'song or artist name', size: 40 %>
+    <%= f.submit 'Search', class: 'btn' %>
+  </div>
+<% end %>
+
+<% if @tracks.present? %>
+  <h2>Results for "<%= h(@query) %>"</h2>
+  <ul class="search-results">
+    <% @tracks.each do |t| %>
+      <li style="display:flex; gap:12px; margin-bottom:12px; align-items:center;">
+        <div style="flex:1">
+          <div><strong><%= t[:name] %></strong></div>
+          <div><em><%= t[:artists] %></em> — <%= t[:album] %></div>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <%= link_to 'Review', new_review_path(track_id: t[:id], track_name: t[:name], artists: t[:artists], album_title: t[:album]), class: 'btn' %>
+          <% if params[:playlist_id].present? %>
+            <%= form_with url: Rails.application.routes.url_helpers.add_lastfm_track_playlist_path(params[:playlist_id]), method: :post, local: true do |ff| %>
+              <%= ff.hidden_field :track_name, value: t[:name] %>
+              <%= ff.hidden_field :artists, value: t[:artists] %>
+              <%= ff.hidden_field :album_title, value: t[:album] %>
+              <%= ff.hidden_field :external_url, value: t[:external_url] %>
+              <%= ff.submit 'Add to playlist', class: 'btn btn-outline-primary' %>
+            <% end %>
+          <% elsif t[:external_url] %>
+            <%= link_to 'Open in Last.fm', t[:external_url], target: '_blank', rel: 'noopener', class: 'btn btn-secondary' %>
+          <% end %>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+<% elsif @query.present? %>
+  <p>No results found for "<%= h(@query) %>".</p>
+<% end %>
+

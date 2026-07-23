@@ -1,0 +1,111 @@
+<% if current_user %>
+  <div class="cta-section">
+    <div class="cta-card primary-cta">
+      <h2>🎵 Review Your Recently Played Songs</h2>
+      <p>Pick a few tracks you recently listened to and share your thoughts with the community.</p>
+      <%= link_to "Review Recently Played →", lastfm_recent_path, class: "btn btn-cta" %>
+    </div>
+  </div>
+
+  <div class="search-section">
+    <h3>Search Last.fm</h3>
+    <p class="section-description">Find any song or artist and write a review</p>
+    <%= form_with url: lastfm_search_path, method: :get, local: true, html: { class: 'search-form' } do |f| %>
+      <div class="search-form-group " >
+        <%= f.text_field :q, placeholder: 'Search by song title or artist name...', value: params[:q], class: 'search-input width-full' %>
+        <%= f.submit 'Search & Review', class: 'btn btn-secondary' %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="recommendations-section">
+    <h3>Recommended For You</h3>
+    <p class="section-description">Based on your Last.fm listening history and reviews</p>
+    <% if @recommendations.present? %>
+      <ol style="list-style: decimal; padding-left: 20px;">
+        <% @recommendations.each do |item| %>
+          <% if item.is_a?(Song) || item.respond_to?(:title) %>
+            <% s = item %>
+            <% avg = (s.respond_to?(:avg_rating) && s.avg_rating) || s.average_rating %>
+            <li style="display: flex; align-items: center; justify-content: space-between; padding: 12px; margin-bottom: 8px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); list-style-position: inside;">
+              <div style="flex: 1; min-width: 0;">
+                <div class="song-title" style="font-weight: 500;">
+                  <%= link_to s.title, song_path(s) %>
+                </div>
+                <div class="song-artist" style="color: var(--text-secondary); font-size: 0.9em;">
+                  <%= s.artist %>
+                  <% if avg %>
+                    <span style="color: #ffd700; margin-left: 8px;">★ <%= sprintf("%.1f", avg) %></span>
+                  <% end %>
+                </div>
+              </div>
+              <div class="recommendation-action" style="margin-left: 12px;">
+                <%= link_to 'Review', new_review_path(song_id: s.id), class: 'btn btn-compact' %>
+              </div>
+            </li>
+          <% elsif item.is_a?(Hash) && item[:name].present? %>
+            <li style="display: flex; align-items: center; justify-content: space-between; padding: 12px; margin-bottom: 8px; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color); list-style-position: inside;">
+              <div style="flex: 1; min-width: 0;">
+                <div class="song-title" style="font-weight: 500;">
+                  <% if item[:url].present? %>
+                    <a href="<%= item[:url] %>" target="_blank" rel="noopener noreferrer"><%= item[:name] %></a>
+                  <% else %>
+                    <%= item[:name] %>
+                  <% end %>
+                </div>
+                <div class="song-artist" style="color: var(--text-secondary); font-size: 0.9em;">
+                  <%= item[:artist] %>
+                  <% if item[:source] == 'lastfm' %>
+                    <span style="font-size: 0.8em; color: #e31b23; margin-left: 8px;" title="Recommended from Last.fm">♫ Last.fm</span>
+                  <% end %>
+                </div>
+              </div>
+              <div class="recommendation-action" style="margin-left: 12px;">
+                <%= link_to 'Review', new_review_path(track_name: item[:name], artists: item[:artist], album_title: nil), class: 'btn btn-compact' %>
+              </div>
+            </li>
+          <% end %>
+        <% end %>
+      </ol>
+    <% else %>
+      <div class="empty-recommendations" style="padding: 20px; text-align: center; background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border-color);">
+        <p>Loading recommendations from your Last.fm listening history... This may take a moment on first load.</p>
+        <p style="margin-top: 10px;">
+          <small>If no recommendations appear, try <%= link_to 'reviewing some songs', lastfm_recent_path %> first.</small>
+        </p>
+      </div>
+    <% end %>
+  </div>
+
+<% else %>
+  <div class="welcome-section">
+    <div class="welcome-card">
+      <h1>♫ Welcome to Aura</h1>
+      <h2>Where Music Taste Comes to Life</h2>
+      <p class="welcome-description">
+        Join our community of music lovers. Share your reviews, discover new tracks, and connect with people who share your taste in music.
+      </p>
+      <div class="welcome-actions">
+        <%= link_to "Sign Up", new_user_path, class: "btn btn-primary" %>
+        <%= link_to "Sign In", new_session_path, class: "btn btn-secondary" %>
+      </div>
+      <div class="welcome-features">
+        <div class="feature">
+          <div class="feature-icon">🎵</div>
+          <h4>Review Music</h4>
+          <p>Share your thoughts on your favorite tracks</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🔍</div>
+          <h4>Discover New Songs</h4>
+          <p>Get personalized recommendations</p>
+        </div>
+        <div class="feature">
+          <div class="feature-icon">👥</div>
+          <h4>Connect with Friends</h4>
+          <p>Follow other music enthusiasts</p>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

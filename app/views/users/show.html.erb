@@ -1,0 +1,85 @@
+<div class="profile-header">
+  <h1 class="profile-name"><%= @user.name %></h1>
+  <p class="profile-username">@<%= @user.username %></p>
+  
+  <div class="lastfm-connection-section" style="margin: 1rem 0;">
+    <% if current_user && current_user.id == @user.id %>
+      <%# User viewing their own profile - show connect/disconnect options %>
+      <% if @user.lastfm_connected %>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <p style="color: #d51007; margin: 0;">♫ Last.fm Connected</p>
+          <%= button_to "Disconnect Last.fm", disconnect_lastfm_path, method: :delete, class: "btn btn-sm", form: { style: "display: inline;" } %>
+        </div>
+      <% else %>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+          <p style="margin: 0;">Connect your Last.fm account to review recently played songs</p>
+          <%= link_to "Connect Last.fm", lastfm_auth_path, class: "btn btn-primary btn-sm", data: { turbo: false } %>
+        </div>
+      <% end %>
+    <% else %>
+      <%# Viewing someone else's profile - just show status %>
+      <% if @user.lastfm_connected %>
+        <p style="color: #d51007;">♫ Last.fm Connected</p>
+      <% end %>
+    <% end %>
+  </div>
+  
+  <div class="profile-stats-grid">
+    <div class="stat-card">
+      <div class="stat-value"><%= @user.reviews.count %></div>
+      <div class="stat-label">Reviews</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value"><%= link_to @user.followers.count, followers_friend_path(@user) %></div>
+      <div class="stat-label">Followers</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value"><%= link_to @user.following.count, following_friend_path(@user) %></div>
+      <div class="stat-label">Following</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value"><%= @user.reviews.average(:rating)&.round(1) || 0 %></div>
+      <div class="stat-label">Avg Rating</div>
+    </div>
+  </div>
+</div>
+
+<%= render 'analytics' %>
+
+<div id="follow-btn-<%= @user.id %>">
+  <% if defined?(current_user) && current_user && current_user.id != @user.id %>
+    <% if current_user.following?(@user) %>
+      <%= button_to "Following", unfollow_friend_path(@user), method: :delete, class: "btn btn-outline-secondary", title: "Unfollow" %>
+    <% else %>
+      <%= button_to "Follow", follow_friend_path(@user), method: :post, class: "btn btn-primary", title: "Follow" %>
+    <% end %>
+  <% end %>
+</div>
+
+
+<h2>Recent Reviews</h2>
+
+<% if @user.reviews.any? %>
+  <%# Order reviews by song title, artist, album as requested %>
+  <% @user.reviews.joins(:song).order(Arel.sql("songs.title ASC, songs.artist ASC, COALESCE(songs.album, '') ASC")).each do |review| %>
+    <div class="review" style="display: flex; gap: 1rem; align-items: flex-start;">
+      <% if @review_images&.dig(review.id).present? %>
+        <img src="<%= @review_images[review.id] %>" alt="<%= review.song.album.presence || review.song.title %>" style="width: 80px; height: 80px; object-fit: cover; border-radius: 6px; flex-shrink: 0;" />
+      <% end %>
+      <div style="flex: 1;">
+        <div class="review-header">
+          <span class="review-user">
+            <%= link_to review.song.title, song_path(review.song) %> — <%= review.song.artist %> <%= review.song.album.present? ? "— #{review.song.album}" : '' %>
+          </span>
+          <span class="review-rating"><%= review.rating %></span>
+        </div>
+        <p class="review-comment"><%= review.comment %></p>
+      </div>
+    </div>
+  <% end %>
+<% else %>
+  <div class="empty-state">
+    <p>No reviews yet</p>
+    <p class="text-muted"><%= @user.name %> hasn't reviewed any songs yet.</p>
+  </div>
+<% end %>

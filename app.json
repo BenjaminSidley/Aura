@@ -1,0 +1,34 @@
+{
+  "name": "Aura Application",
+  "description": "Ruby on Rails application with Cucumber and RSpec",
+  "repository": "https://github.com/kian-r-silva/Aura",
+  "keywords": ["ruby", "rails", "cucumber", "rspec"],
+  "addons": [
+    "heroku-postgresql"
+  ],
+  "env": {
+    "RAILS_ENV": {
+      "description": "Rails environment",
+      "value": "production"
+    },
+    "RACK_ENV": {
+      "description": "Rack environment",
+      "value": "production"
+    },
+    "SECRET_KEY_BASE": {
+      "description": "Secret key for verifying the integrity of signed cookies",
+      "generator": "secret"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/ruby"
+    }
+  ]
+}

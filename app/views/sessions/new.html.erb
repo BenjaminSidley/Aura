@@ -1,0 +1,20 @@
+<h2>Sign in to Aura</h2>
+<p class="text-muted">Welcome back! Sign in to continue tracking your music</p>
+
+<%= form_with url: session_path, local: true do |f| %>
+  <div>
+    <%= label_tag :login, "Username or Email" %><br>
+    <%= text_field_tag :login, nil, autocomplete: "username", placeholder: "Enter your username or email" %>
+  </div>
+
+  <div>
+    <%= label_tag :password, "Password" %><br>
+    <%= password_field_tag :password, nil, autocomplete: "current-password", placeholder: "Enter your password" %>
+  </div>
+
+  <div>
+    <%= submit_tag "Sign In" %>
+  </div>
+<% end %>
+
+<p class="text-muted mt-lg">Don't have an account? <%= link_to "Sign up here", new_user_path %></p>
