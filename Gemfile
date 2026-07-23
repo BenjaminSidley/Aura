@@ -90,7 +90,7 @@ group :development do
   gem "annotate"
 end
 
-gem "pg", "~> 1.5"
+gem "pg", "~> 1.6"
 
 group :development, :test do
   gem 'rubocop', require: false
