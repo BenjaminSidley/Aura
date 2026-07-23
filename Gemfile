@@ -72,7 +72,7 @@ group :test do
 end
 
 group :development, :test do
-  gem "rspec-rails", "~> 6.0"
+  gem "rspec-rails", "~> 8.0"
   gem "cucumber-rails", require: false
   gem "database_cleaner"
   gem "factory_bot_rails"
